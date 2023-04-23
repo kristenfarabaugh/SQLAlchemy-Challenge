@@ -82,7 +82,6 @@ def stations():
     stations = session.query(station.station).all()
     
     # Convert list of tuples into normal list & JSONify
-
     return jsonify (('Stations'),list(np.ravel(stations)))
 
 
@@ -111,8 +110,10 @@ def temperature():
     return jsonify (('Most Active Station Temp Data'),list(np.ravel(top_station)))
 
 
-# @app.route('/api/v1.0/<start>')
-# @app.route('/api/v1.0/<start>/<end>')
+@app.route('/api/v1.0/<start>')
+
+
+@app.route('/api/v1.0/<start>/<end>')
 
 if __name__ == "__main__":
     app.run(debug=True)
