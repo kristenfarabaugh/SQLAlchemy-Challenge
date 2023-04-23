@@ -111,9 +111,34 @@ def temperature():
 
 
 @app.route('/api/v1.0/<start>')
-
-
 @app.route('/api/v1.0/<start>/<end>')
+def dates(start = None, end = None):
+   # Create our session (link) from Python to the DB
+    session = Session(engine)
+
+    #Converts dates to right format
+    start = dt.datetime.strptime(start, '%Y-%m-%d').date()
+    end = dt.datetime.strptime(end, '%Y-%m-%d').date()
+
+    # no end date, do this     
+    if not end:
+        lowest_temperature = session.query(func.min(measurement.tobs)).filter(measurement.date >= start).all()
+        highest_temperature = session.query(func.max(measurement.tobs)).filter(measurement.date >= start).all()
+        average_temperature = session.query(func.avg(measurement.tobs)).filter(measurement.date >= start).all()
+        
+        return jsonify({'Lowest Temperature':lowest_temperature, 
+                        'Highest Temperature': highest_temperature, 
+                        'Average Temperaqture' :average_temperature})
+    #else, do this
+    else: 
+        lowest_temperature = session.query(func.min(measurement.tobs)).filter(measurement.date >= start).filter(measurement.date <= end).all()
+        highest_temperature = session.query(func.max(measurement.tobs)).filter(measurement.date >= start).filter(measurement.date <= end).all()
+        average_temperature = session.query(func.avg(measurement.tobs)).filter(measurement.date >= start).filter(measurement.date <= end).all()
+        
+        return jsonify({'Lowest Temperature':lowest_temperature, 
+                        'Highest Temperature': highest_temperature, 
+                        'Average Temperaqture' :average_temperature})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
